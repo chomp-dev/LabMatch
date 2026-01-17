@@ -11,7 +11,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { LiveScanVisualizer } from '@/components/LiveScanVisualizer';
 import { useLikedProfessors } from '@/context/LikedProfessorsContext';
 
-const API_BASE_URL = 'http://localhost:8000';
+import { API_BASE_URL } from '@/constants/Config';
 
 export default function DiscoverScreen() {
   const [professors, setProfessors] = useState<Professor[]>([]);
