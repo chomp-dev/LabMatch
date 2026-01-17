@@ -62,6 +62,15 @@ class ApiService {
         // For now, we'll just log it
         console.log(`Swipe recorded: ${decision} for professor ${professorCardId}`);
     }
+
+    async checkHealth(): Promise<boolean> {
+        try {
+            const response = await fetch(`${this.baseUrl}/`, { method: 'GET' });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    }
 }
 
 export const apiService = new ApiService();
