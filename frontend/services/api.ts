@@ -63,12 +63,14 @@ class ApiService {
         console.log(`Swipe recorded: ${decision} for professor ${professorCardId}`);
     }
 
-    async checkHealth(): Promise<boolean> {
+    async checkHealth(): Promise<'healthy' | 'down' | 'supabase_down'> {
         try {
             const response = await fetch(`${this.baseUrl}/`, { method: 'GET' });
-            return response.ok;
+            if (response.ok) return 'healthy';
+            if (response.status === 503) return 'supabase_down';
+            return 'down';
         } catch (error) {
-            return false;
+            return 'down';
         }
     }
 }

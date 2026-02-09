@@ -36,7 +36,14 @@ supabase = get_supabase_client()
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to LabMatch API"}
+    try:
+        # Simple health check for Supabase
+        supabase.table("scrape_sessions").select("id").limit(1).execute()
+        return {"message": "Welcome to LabMatch API", "status": "healthy"}
+    except Exception as e:
+        logging.error(f"Health check failed: {e}")
+        # Return 503 so frontend knows service is degraded
+        raise HTTPException(status_code=503, detail="Supabase is down")
 
 @app.post("/parse-resume")
 async def parse_resume(file: UploadFile = File(...)):

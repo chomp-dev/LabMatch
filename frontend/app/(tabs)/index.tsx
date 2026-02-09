@@ -18,7 +18,9 @@ export default function DiscoverScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionUrl, setSessionUrl] = useState('');
+  const [major, setMajor] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [scanEvents, setScanEvents] = useState<any[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const { likedProfessors, addLikedProfessor, clearLikedProfessors } = useLikedProfessors();
@@ -100,12 +102,12 @@ export default function DiscoverScreen() {
   }, [currentProfessor, addLikedProfessor]);
 
   const handleStartSession = async () => {
-    if (!sessionUrl.trim()) {
-      Alert.alert("URL Required", "Please enter a university URL to start scanning.");
+    if (!sessionUrl.trim() || !major.trim() || !customPrompt.trim()) {
+      setValidationError("Please fill out all fields.");
       return;
     }
-    // Logic: Prompt is optional but encouraged.
 
+    setValidationError(null);
     setIsLoading(true);
     setProfessors([]);
     setScanEvents([]);
@@ -122,7 +124,8 @@ export default function DiscoverScreen() {
         body: JSON.stringify({
           user_id: "d6ed9bed-5e3e-41c0-85fd-d6bf925f150c",
           root_urls: [sessionUrl],
-          objective_prompt: customPrompt.trim() || "Find professors",
+          objective_prompt: customPrompt.trim(),
+          major: major.trim(),
           custom_prompt: customPrompt.trim()
         }),
       });
@@ -202,7 +205,9 @@ export default function DiscoverScreen() {
     setCurrentIndex(0);
     clearLikedProfessors();
     setSessionUrl('');
+    setMajor('');
     setCustomPrompt('');
+    setValidationError(null);
     setProfessors([]);
     setScanEvents([]);
   };
@@ -306,35 +311,60 @@ export default function DiscoverScreen() {
                   </Text>
                 </Pressable>
 
+                {/* Error Banner */}
+                {validationError ? (
+                  <Text style={styles.errorText}>{validationError}</Text>
+                ) : null}
+
                 {/* URL Input */}
-                <View style={styles.urlInputContainer}>
+                <View style={[styles.urlInputContainer, validationError && !sessionUrl ? styles.inputError : null]}>
                   <IconSymbol name="link" size={16} color="#94a3b8" />
                   <TextInput
                     style={styles.urlInput}
                     placeholder="Department URL (e.g. cs.university.edu/people)"
                     placeholderTextColor="#64748b"
                     value={sessionUrl}
-                    onChangeText={setSessionUrl}
+                    onChangeText={(text) => {
+                      setSessionUrl(text);
+                      if (validationError) setValidationError(null);
+                    }}
                     autoCapitalize="none"
                     autoCorrect={false}
                   />
                 </View>
 
+                {/* Major Input */}
+                <View style={[styles.urlInputContainer, validationError && !major ? styles.inputError : null]}>
+                  <IconSymbol name="graduationcap.fill" size={16} color="#94a3b8" />
+                  <TextInput
+                    style={styles.urlInput}
+                    placeholder="Major (e.g. Computer Science)"
+                    placeholderTextColor="#64748b"
+                    value={major}
+                    onChangeText={(text) => {
+                      setMajor(text);
+                      if (validationError) setValidationError(null);
+                    }}
+                  />
+                </View>
+
                 {/* Prompt Input */}
-                <View style={styles.promptContainer}>
+                <View style={[styles.promptContainer, validationError && !customPrompt ? styles.inputError : null]}>
                   <TextInput
                     style={styles.promptInput}
                     placeholder="What are you looking for? (e.g. AI agents, systems)..."
                     placeholderTextColor="#64748b"
                     value={customPrompt}
-                    onChangeText={setCustomPrompt}
+                    onChangeText={(text) => {
+                      setCustomPrompt(text);
+                      if (validationError) setValidationError(null);
+                    }}
                     multiline
                     textAlignVertical="top"
                   />
                   <Pressable
-                    style={[styles.sendButton, (!sessionUrl) && styles.sendButtonDisabled]}
+                    style={[styles.sendButton, (!sessionUrl || !major || !customPrompt) && styles.sendButtonDisabled]}
                     onPress={handleStartSession}
-                    disabled={!sessionUrl}
                   >
                     <IconSymbol name="arrow.up" size={20} color="#fff" />
                   </Pressable>
@@ -548,5 +578,17 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     fontSize: 13,
     fontWeight: '500',
+  },
+  errorText: {
+    color: '#ef4444', // Red error color
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center',
+    width: '100%',
+  },
+  inputError: {
+    borderColor: '#ef4444',
+    borderWidth: 1,
   },
 });

@@ -4,15 +4,15 @@ import { apiService } from '@/services/api';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export function BackendHealthCheck() {
-    const [isBackendUp, setIsBackendUp] = useState(true);
+    const [status, setStatus] = useState<'healthy' | 'down' | 'supabase_down'>('healthy');
     const insets = useSafeAreaInsets();
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout;
 
         const checkStatus = async () => {
-            const isUp = await apiService.checkHealth();
-            setIsBackendUp(isUp);
+            const currentStatus = await apiService.checkHealth();
+            setStatus(currentStatus);
         };
 
         // Initial check
@@ -24,14 +24,16 @@ export function BackendHealthCheck() {
         return () => clearInterval(intervalId);
     }, []);
 
-    if (isBackendUp) {
+    if (status === 'healthy') {
         return null;
     }
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
             <Text style={styles.text}>
-                Backend is starting up, please wait (~60s)...
+                {status === 'supabase_down'
+                    ? "Supabase is down due to free tier, contacted owner to restart it"
+                    : "We are on free tier, please wait about a minute for backend to spin up..."}
             </Text>
         </View>
     );

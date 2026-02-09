@@ -71,6 +71,13 @@ try:
     if not url or not key:
         print("Warning: SUPABASE_URL or KEY missing.")
     
+    if "hvbmmywuurmbvnhqirep" in url:
+        print("\n" + "="*80)
+        print("CRITICAL: You are using a placeholder Supabase URL.") 
+        print("Please update backend/.env with your actual Supabase project URL.")
+        print("The current value 'hvbmmywuurmbvnhqirep' is invalid and will cause connection errors.")
+        print("="*80 + "\n")
+
     supabase = SimpleSupabaseClient(url, key)
 except Exception as e:
     print(f"Supabase init failed: {e}")
