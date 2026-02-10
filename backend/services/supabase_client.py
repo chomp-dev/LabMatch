@@ -36,6 +36,10 @@ class QueryBuilder:
         self.params[f"{column}"] = f"eq.{value}"
         return self
 
+    def limit(self, count):
+        self.params["limit"] = count
+        return self
+
     def execute(self):
         try:
             if self.method == "GET":

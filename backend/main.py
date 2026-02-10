@@ -143,7 +143,15 @@ async def stream_session_logs(session_id: uuid.UUID):
             # Client disconnected
             pass
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    return StreamingResponse(
+        event_generator(), 
+        media_type="text/event-stream",
+        headers={
+            "X-Accel-Buffering": "no",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        }
+    )
 
 @app.post("/ingest")
 async def ingest_artifact(artifact: dict):

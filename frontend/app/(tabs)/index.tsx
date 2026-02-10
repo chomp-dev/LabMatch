@@ -18,7 +18,6 @@ export default function DiscoverScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionUrl, setSessionUrl] = useState('');
-  const [major, setMajor] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [scanEvents, setScanEvents] = useState<any[]>([]);
@@ -102,7 +101,7 @@ export default function DiscoverScreen() {
   }, [currentProfessor, addLikedProfessor]);
 
   const handleStartSession = async () => {
-    if (!sessionUrl.trim() || !major.trim() || !customPrompt.trim()) {
+    if (!sessionUrl.trim() || !customPrompt.trim()) {
       setValidationError("Please fill out all fields.");
       return;
     }
@@ -125,7 +124,6 @@ export default function DiscoverScreen() {
           user_id: "d6ed9bed-5e3e-41c0-85fd-d6bf925f150c",
           root_urls: [sessionUrl],
           objective_prompt: customPrompt.trim(),
-          major: major.trim(),
           custom_prompt: customPrompt.trim()
         }),
       });
@@ -205,7 +203,6 @@ export default function DiscoverScreen() {
     setCurrentIndex(0);
     clearLikedProfessors();
     setSessionUrl('');
-    setMajor('');
     setCustomPrompt('');
     setValidationError(null);
     setProfessors([]);
@@ -333,21 +330,6 @@ export default function DiscoverScreen() {
                   />
                 </View>
 
-                {/* Major Input */}
-                <View style={[styles.urlInputContainer, validationError && !major ? styles.inputError : null]}>
-                  <IconSymbol name="graduationcap.fill" size={16} color="#94a3b8" />
-                  <TextInput
-                    style={styles.urlInput}
-                    placeholder="Major (e.g. Computer Science)"
-                    placeholderTextColor="#64748b"
-                    value={major}
-                    onChangeText={(text) => {
-                      setMajor(text);
-                      if (validationError) setValidationError(null);
-                    }}
-                  />
-                </View>
-
                 {/* Prompt Input */}
                 <View style={[styles.promptContainer, validationError && !customPrompt ? styles.inputError : null]}>
                   <TextInput
@@ -363,7 +345,7 @@ export default function DiscoverScreen() {
                     textAlignVertical="top"
                   />
                   <Pressable
-                    style={[styles.sendButton, (!sessionUrl || !major || !customPrompt) && styles.sendButtonDisabled]}
+                    style={[styles.sendButton, (!sessionUrl || !customPrompt) && styles.sendButtonDisabled]}
                     onPress={handleStartSession}
                   >
                     <IconSymbol name="arrow.up" size={20} color="#fff" />
